@@ -9,7 +9,7 @@ final class CombineExtensionTests: XCTestCase {
 
     func testLoadFromPublisher() throws {
         let sut = GPXFileParser(xmlString: testXMLWithoutExtensions)
-        let expectation = self.expectation(description: "publisher")
+        let expectation = self.expectation(waypointDescription: "publisher")
 
         let cancellable = sut.publisher
             .sink { completion in
@@ -29,7 +29,7 @@ final class CombineExtensionTests: XCTestCase {
     }
 
     func testLoadFromDataFactoryMethod() throws {
-        let expectation = self.expectation(description: "publisher")
+        let expectation = self.expectation(waypointDescription: "publisher")
         let cancellable = GPXFileParser.load(from: testXMLWithoutExtensions.data(using: .utf8)!)
             .sink { completion in
                 switch completion {

@@ -58,7 +58,7 @@ public final class GPXExporter {
             if let comment = waypoint.comment {
                 children.append(GPXTags.comment.embed(comment))
             }
-            if let description = waypoint.description {
+            if let description = waypoint.waypointDescription {
                 children.append(GPXTags.description.embed(description))
             }
             return GPXTags.waypoint.embed(attributes: attributes, children.joined(separator: "\n"))

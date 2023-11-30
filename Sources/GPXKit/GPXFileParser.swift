@@ -244,7 +244,7 @@ internal extension Waypoint {
         self.date = waypointNode.childFor(.time)?.date
         self.name = waypointNode.childFor(.name)?.content
         self.comment = waypointNode.childFor(.comment)?.content
-        self.description = waypointNode.childFor(.description)?.content
+        self.waypointDescription = waypointNode.childFor(.description)?.content
     }
 }
 
