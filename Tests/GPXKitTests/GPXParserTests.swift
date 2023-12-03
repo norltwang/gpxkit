@@ -241,7 +241,7 @@ class GPXParserTests: XCTestCase {
         parseXML(sampleGPX)
 
         let distance = try XCTUnwrap(result?.graph.distance)
-        let elevation = try XCTUnwrap(result?.graph.elevationGain)
+        let elevation = try XCTUnwrap(result?.graph.elevationAscent)
 
         XCTAssertEqual(3100.5625, distance, accuracy: 10)
         XCTAssertEqual(115.19, elevation, accuracy: 0.1)
@@ -250,7 +250,7 @@ class GPXParserTests: XCTestCase {
     func testTracksWithoutElevationInTheGPXHaveAnElevationOfZero() throws {
         parseXML(given(points: [.leipzig, .postPlatz, .dehner]))
 
-        let elevation = try XCTUnwrap(result?.graph.elevationGain)
+        let elevation = try XCTUnwrap(result?.graph.elevationAscent)
         XCTAssertEqual(0, elevation)
     }
 
@@ -519,7 +519,7 @@ class GPXParserTests: XCTestCase {
         XCTAssertEqual([], track.graph.heightMap)
         XCTAssertEqual([], track.graph.segments)
         XCTAssertEqual(.zero, track.graph.distance)
-        XCTAssertEqual(.zero, track.graph.elevationGain)
+        XCTAssertEqual(.zero, track.graph.elevationAscent)
         XCTAssertEqual([
             Waypoint(coordinate: .init(latitude: 53.060632820504345, longitude: 5.6932974383264616, elevation: 8.4)),
             Waypoint(coordinate: .init(latitude: 53.06485377614443, longitude: 5.702670398232679, elevation: 8.3)),
@@ -556,7 +556,7 @@ class GPXParserTests: XCTestCase {
         XCTAssertEqual([], track.graph.heightMap)
         XCTAssertEqual([], track.graph.segments)
         XCTAssertEqual(.zero, track.graph.distance)
-        XCTAssertEqual(.zero, track.graph.elevationGain)
+        XCTAssertEqual(.zero, track.graph.elevationAscent)
         XCTAssertEqual([
             Waypoint(coordinate: .init(latitude: 53.060632820504345, longitude: 5.6932974383264616, elevation: 8.4)),
             Waypoint(coordinate: .init(latitude: 53.06485377614443, longitude: 5.702670398232679, elevation: 8.3)),

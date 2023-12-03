@@ -77,7 +77,7 @@ final class TrackGraphTests: XCTestCase {
 
         sut = TrackGraph(coords: coordinates, elevationSmoothing: .segmentation(50))
 
-        XCTAssertEqual(0, sut.elevationGain)
+        XCTAssertEqual(0, sut.elevationAscent)
     }
 
     func testTotalElevationWithDifferentElevation() {
@@ -93,7 +93,7 @@ final class TrackGraphTests: XCTestCase {
         sut = TrackGraph(coords: coordinates, elevationSmoothing: .segmentation(50))
 
         // 10 + 95 + 268
-        XCTAssertEqual(373, sut.elevationGain)
+        XCTAssertEqual(373, sut.elevationAscent)
     }
 
     func testInitializationFromGPX() {
@@ -130,7 +130,7 @@ final class TrackGraphTests: XCTestCase {
         sut = TrackGraph(coords: coordinates, elevationSmoothing: .segmentation(50))
 
         // 10 + 95 + 268
-        XCTAssertEqual(50, sut.elevationGain)
+        XCTAssertEqual(50, sut.elevationAscent)
     }
 
     func testElevationGainIsTheSumOfAllElevationDifferences() {
@@ -145,7 +145,7 @@ final class TrackGraphTests: XCTestCase {
 
         sut = TrackGraph(coords: coordinates, elevationSmoothing: .segmentation(50))
 
-        XCTAssertEqual(30 + 80 + 10, sut.elevationGain)
+        XCTAssertEqual(30 + 80 + 10, sut.elevationAscent)
     }
 
     func testEmptyTrackGraphHasNoClimbs() {

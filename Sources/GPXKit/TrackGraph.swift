@@ -7,7 +7,10 @@ public struct TrackGraph: Hashable, Sendable, Codable  {
     /// The overall distance of a track in meters.
     public var distance: Double
     /// The overall elevation gain of a track in meters.
-    public var elevationGain: Double
+    public var elevationAscent: Double
+    
+    public var elevationDescent: Double
+    
     /// A heightmap, which is an array of `DistanceHeight` values. Each value in the heightMap has the total distance in meters up to that point (imagine it as the values along the x-axis in a 2D-coordinate graph) paired with the elevation in meters above sea level at that point (the y-value in the aforementioned 2D-graph).
     public var heightMap: [DistanceHeight]
     /// Array of `GradeSegment`s. The segments describe the grade over the entire track with specified interval length in meters in initializer.
@@ -26,15 +29,17 @@ public struct TrackGraph: Hashable, Sendable, Codable  {
     /// - Parameters:
     ///   - segments: An array of `TrackSegment`s.
     ///   - distance: The total distance in meters.
-    ///   - elevationGain: The total elevation gain.
+    ///   - elevationAscent: The total elevation gain.
     ///   - heightMap: The height-map
     @available(*, deprecated, message: "Will be removed in a future release, don't use it anymore!")
-    public init(segments: [TrackSegment], distance: Double, elevationGain: Double, heightMap: [DistanceHeight]) {
+    public init(segments: [TrackSegment], distance: Double, elevationGain: Double,elevationDescent: Double, heightMap: [DistanceHeight]) {
         self.segments = segments
         self.distance = distance
-        self.elevationGain = elevationGain
+        self.elevationAscent = elevationGain
+        self.elevationDescent = elevationDescent
         self.heightMap = heightMap
         self.gradeSegments = [.init(start: 0, end: distance, grade: elevationGain/distance)]
+       
     }
 }
 
@@ -62,10 +67,17 @@ public extension TrackGraph {
             TrackSegment(coordinate: $0, distanceInMeters: $1)
         }
         distance = distances.reduce(0, +)
-        elevationGain = coords.calculateElevationGain()
+        elevationAscent = coords.calculateElevationGain()
         let heightmap = segments.reduce(into: [DistanceHeight]()) { acc, segment in
             let distanceSoFar = (acc.last?.distance ?? 0) + segment.distanceInMeters
             acc.append(DistanceHeight(distance: distanceSoFar, elevation: segment.coordinate.elevation))
+        }
+        elevationDescent = zippedCoords.reduce(0.0) { elevation, pair in
+            let delta = pair.1.elevation - pair.0.elevation
+            if delta < 0 {
+                return elevation + abs(delta)
+            }
+            return elevation
         }
         self.heightMap = heightmap
         self.gradeSegments = heightmap.calculateGradeSegments(elevationSmoothing)
