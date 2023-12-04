@@ -6,13 +6,16 @@ public struct DistanceHeight: Hashable, Sendable, Codable {
     public var distance: Double
     /// Elevation in meters above sea level at that position in the track
     public var elevation: Double
+    /// Coordinate associated with the distance in the track
+    public var coordinate: Coordinate?
 
     /// Initializes a `DistanceHeight` value. You don't need to construct this value by yourself, as it is done by GXPKits track parsing logic.
     /// - Parameters:
     ///   - distance: Distance from the tracks start location in meters.
     ///   - elevation: Elevation in meters above sea level at that track position.
-    public init(distance: Double, elevation: Double) {
+    public init(distance: Double, elevation: Double,coordinate: Coordinate? = nil) {
         self.distance = distance
         self.elevation = elevation
+        self.coordinate = coordinate
     }
 }

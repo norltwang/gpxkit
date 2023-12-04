@@ -70,7 +70,7 @@ public extension TrackGraph {
         elevationAscent = coords.calculateElevationGain()
         let heightmap = segments.reduce(into: [DistanceHeight]()) { acc, segment in
             let distanceSoFar = (acc.last?.distance ?? 0) + segment.distanceInMeters
-            acc.append(DistanceHeight(distance: distanceSoFar, elevation: segment.coordinate.elevation))
+            acc.append(DistanceHeight(distance: distanceSoFar, elevation: segment.coordinate.elevation,coordinate: segment.coordinate))
         }
         elevationDescent = zippedCoords.reduce(0.0) { elevation, pair in
             let delta = pair.1.elevation - pair.0.elevation
