@@ -25,7 +25,7 @@ extension TrackGraph {
 public struct ElevationChartData {
 //    private var origin: [DistanceHeight]
     public var simplified: [DistanceHeight]
-    
+    public var domains: (distance: [Double], elevation: [Double])
     private func findMultipleDH(every step: Double,in heightMap: [DistanceHeight]) -> [DistanceHeight] {
         var result = [DistanceHeight]()
         
@@ -112,6 +112,7 @@ public struct ElevationChartData {
      
     public init(origin: [DistanceHeight],step: Double = 50) {
         self.simplified = []
+        self.domains = origin.domains
         self.simplified = (self.findMultipleDH(every: step, in: origin) + findMinMax(in: origin)).sorted(by: { $0.distance < $1.distance })
     }
     
@@ -132,7 +133,7 @@ extension Array where Element == DistanceHeight {
         return minMax
     }
     
-    public var domains: (distance: [Double], elevation: [Double]) {
+    fileprivate var domains: (distance: [Double], elevation: [Double]) {
         return (dis_domain,ele_domain)
     }
     
