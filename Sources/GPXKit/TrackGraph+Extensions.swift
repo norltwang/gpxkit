@@ -37,7 +37,7 @@ public struct ElevationChartData {
             
             // Check if the current value is closer than the previously found closest element
             if let currentClosest = closestedElements[closestMultiple] {
-                if abs(dh.distance - Double(closestMultiple)) < abs(currentClosest.distance - Double(closestMultiple)) {
+                if abs(dh.distance - closestMultiple) < abs(currentClosest.distance - closestMultiple) {
                     closestedElements[closestMultiple] = dh
                     let newDH = DistanceHeight(distance: dh.distance, elevation: dh.elevation, index: index)
                     result.append(newDH)
