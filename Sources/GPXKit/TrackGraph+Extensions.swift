@@ -11,7 +11,7 @@ import CoreLocation
 //MARK: - TrackGraph
 extension TrackGraph {
     ///  The GCJ-02  Coordinates of this track
-    var transformedPoints: [CLLocationCoordinate2D] {
+    public var transformedPoints: [CLLocationCoordinate2D] {
         self.coreLocationCoordinates.map {
             let (gcjLat,gcjLon) = LocationTransform.wgs2gcj(wgsLat: $0.latitude, wgsLng: $0.longitude)
             return .init(latitude: gcjLat, longitude: gcjLon)
@@ -22,9 +22,9 @@ extension TrackGraph {
 
 //MARK: - ChartData
 
-struct ElevationChartData {
+public struct ElevationChartData {
 //    private var origin: [DistanceHeight]
-    var simplified: [DistanceHeight]
+    public var simplified: [DistanceHeight]
     
     private func findMultipleDH(every step: Double,in heightMap: [DistanceHeight]) -> [DistanceHeight] {
         var result = [DistanceHeight]()
