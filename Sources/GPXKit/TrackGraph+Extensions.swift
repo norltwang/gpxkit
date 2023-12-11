@@ -110,7 +110,7 @@ public struct ElevationChartData {
     }
     
      
-    init(origin: [DistanceHeight],step: Double = 50) {
+    public init(origin: [DistanceHeight],step: Double = 50) {
         self.simplified = []
         self.simplified = (self.findMultipleDH(every: step, in: origin) + findMinMax(in: origin)).sorted(by: { $0.distance < $1.distance })
     }
