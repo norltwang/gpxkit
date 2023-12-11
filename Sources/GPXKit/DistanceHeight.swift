@@ -9,13 +9,16 @@ public struct DistanceHeight: Hashable, Sendable, Codable {
     /// Coordinate associated with the distance in the track
     public var coordinate: Coordinate?
 
+    /// The Chosen Chart Point`s index in the whole 'heightMap'.
+    public var index: Int?
+    
     /// Initializes a `DistanceHeight` value. You don't need to construct this value by yourself, as it is done by GXPKits track parsing logic.
     /// - Parameters:
     ///   - distance: Distance from the tracks start location in meters.
     ///   - elevation: Elevation in meters above sea level at that track position.
-    public init(distance: Double, elevation: Double,coordinate: Coordinate? = nil) {
+    public init(distance: Double, elevation: Double,index: Int? = nil) {
         self.distance = distance
         self.elevation = elevation
-        self.coordinate = coordinate
+        self.index = index
     }
 }
