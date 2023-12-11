@@ -96,15 +96,17 @@ public struct ElevationChartData {
         }
          
     }
-     
+    public func findDH(near target: Double) -> DistanceHeight? {
+        return findDH(near: target, in: simplified)
+    }
     public func findIndex(near target: Double) -> Int? {
-        guard let dh = self.findDH(near: target, in: simplified) else { return nil }
+        guard let dh = self.findDH(near: target) else { return nil }
         return dh.index
     }
     
     public func findRange(with targetRange: Range<Double>) -> ClosedRange<Int>? {
-        guard let lower = self.findDH(near: targetRange.lowerBound, in: simplified) ,
-              let upper = self.findDH(near: targetRange.upperBound, in: simplified) else { return nil }
+        guard let lower = self.findDH(near: targetRange.lowerBound) ,
+              let upper = self.findDH(near: targetRange.upperBound) else { return nil }
         guard let lowerIndex = lower.index,let upperIndex = upper.index,lowerIndex < upperIndex else { return nil }
         return (lowerIndex...upperIndex)
     }
