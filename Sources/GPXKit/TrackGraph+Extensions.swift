@@ -7,7 +7,7 @@
 
 import Foundation
 import CoreLocation
-
+import Algorithms
 //MARK: - TrackGraph
 extension TrackGraph {
     ///  The GCJ-02  Coordinates of this track
@@ -22,35 +22,112 @@ extension TrackGraph {
 
 //MARK: - ChartData
 
+
+//分析该函数的时间复杂度：o(n) Complexity -> o(n)
+typealias  DHElement = (index: Int, quotient: (Double),remainder: Double)
+func findMultipleElements(near target: Double,in array: [Double]) -> [Double] {
+     
+    guard !array.isEmpty else { return [] }
+    let result = array.enumerated().map { return ($0.offset,$0.element) } //: -> o(n)
+        .map { return ($0.0,($0.1 / target).rounded(.towardZero),$0.1.truncatingRemainder(dividingBy: target)) }//: -> o(n)
+        .chunked(by: { $0.1 == $1.1 })//: -> o(n)
+        .map { Array($0) }
+    
+    var tmps: [(Int,(Double),Double)] = result.compactMap { $0.first } //: -> o(n)
+    
+    let drop = result.dropFirst()
+    let new = zip(result, drop) //: -> o(n)
+    
+//    for item in new.enumerated() {
+//        print(item.offset,item.element)
+//        print("\n")
+//    }
+    
+    new.enumerated().forEach {
+        let index = $0.offset
+        let element = $0.element
+        let q2 = element.1.first.map { $0.1 }!
+        let q1 = element.0.first.map { $0.1 }!
+        if q2 - q1 == 1,
+           let r2 = element.1.first?.2,
+           let r1 = element.0.last?.2,
+           abs(target - r1) < r2,
+           let changed = element.0.last {
+            tmps[index + 1] = changed
+        }
+    } //: -> o(n)
+
+    return tmps.map { array[$0.0] }
+}
+
 public struct ElevationChartData {
 //    private var origin: [DistanceHeight]
     public var simplified: [DistanceHeight]
     public var domains: (distance: [Double], elevation: [Double])
-    private func findMultipleDH(every step: Double,in heightMap: [DistanceHeight]) -> [DistanceHeight] {
-        var result = [DistanceHeight]()
+    
+    private func findMultipleDHs(every target: Double,in heightMap: [DistanceHeight]) -> [DistanceHeight] {
         
-        // Keep track of the closest element for each multiple of distance
-        var closestedElements: [Double: DistanceHeight] = [: ]
-        for (index,dh) in heightMap.enumerated() {
-           
-            let closestMultiple = (dh.distance / step).rounded() * step
-            
-            // Check if the current value is closer than the previously found closest element
-            if let currentClosest = closestedElements[closestMultiple] {
-                if abs(dh.distance - closestMultiple) < abs(currentClosest.distance - closestMultiple) {
-                    closestedElements[closestMultiple] = dh
-                    let newDH = DistanceHeight(distance: dh.distance, elevation: dh.elevation, index: index)
-                    result.append(newDH)
-                }
-            } else {
-                closestedElements[closestMultiple] = dh
-                let newDH = DistanceHeight(distance: dh.distance, elevation: dh.elevation, index: index)
-                result.append(newDH)
+        guard !heightMap.isEmpty else { return [] }
+        
+        let result = heightMap.enumerated()
+            .map { return ($0.offset,$0.element) } //: -> o(n)
+            .map{
+                return ($0.0,($0.1.distance / target).rounded(.towardZero),$0.1.distance.truncatingRemainder(dividingBy: target))
             }
-        }
-        return result
+            .chunked(by: { $0.1 == $1.1 })//: -> o(n)
+            .map { Array($0) }
         
+        var tmps: [(Int,(Double),Double)] = result.compactMap { $0.first } //: -> o(n)
+        
+        let drop = result.dropFirst()
+        let new = zip(result, drop) //: -> o(n)
+        
+    //    for item in new.enumerated() {
+    //        print(item.offset,item.element)
+    //        print("\n")
+    //    }
+        
+        new.enumerated().forEach {
+            let index = $0.offset
+            let element = $0.element
+            let q2 = element.1.first.map { $0.1 }!
+            let q1 = element.0.first.map { $0.1 }!
+            if q2 - q1 == 1,
+               let r2 = element.1.first?.2,
+               let r1 = element.0.last?.2,
+               abs(target - r1) < r2,
+               let changed = element.0.last {
+                tmps[index + 1] = changed
+            }
+        } //: -> o(n)
+
+        return tmps.map { heightMap[$0.0] }
     }
+//    private func findMultipleDH(every step: Double,in heightMap: [DistanceHeight]) -> [DistanceHeight] {
+//        var result = [DistanceHeight]()
+//        
+//        // Keep track of the closest element for each multiple of distance
+//        var closestedElements: [Double: DistanceHeight] = [: ]
+//        for (index,dh) in heightMap.enumerated() {
+//           
+//            let closestMultiple = (dh.distance / step).rounded() * step
+//            
+//            // Check if the current value is closer than the previously found closest element
+//            if let currentClosest = closestedElements[closestMultiple] {
+//                if abs(dh.distance - closestMultiple) < abs(currentClosest.distance - closestMultiple) {
+//                    closestedElements[closestMultiple] = dh
+//                    let newDH = DistanceHeight(distance: dh.distance, elevation: dh.elevation, index: index)
+//                    result.append(newDH)
+//                }
+//            } else {
+//                closestedElements[closestMultiple] = dh
+//                let newDH = DistanceHeight(distance: dh.distance, elevation: dh.elevation, index: index)
+//                result.append(newDH)
+//            }
+//        }
+//        return result
+//        
+//    }
     private func findMinMax(in heightMap: [DistanceHeight]) -> [DistanceHeight] {
         guard let minMax = heightMap.eleMinMax else { return [ ] }
         return [minMax.min,minMax.max]
@@ -115,11 +192,13 @@ public struct ElevationChartData {
     public init(origin: [DistanceHeight],step: Double = 50) {
         self.simplified = []
         self.domains = origin.domains
-        self.simplified = (self.findMultipleDH(every: step, in: origin) + findMinMax(in: origin)).sorted(by: { $0.distance < $1.distance })
+        self.simplified = (self.findMultipleDHs(every: step, in: origin) + findMinMax(in: origin)).sorted(by: { $0.distance < $1.distance })
     }
     
     
 }
+
+
 //MARK: - For Elevation Chart
 extension Array where Element == DistanceHeight {
     
