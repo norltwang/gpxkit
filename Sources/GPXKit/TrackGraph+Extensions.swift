@@ -119,7 +119,7 @@ extension Array where Element == DistanceHeight {
 extension Array where Element == DistanceHeight {
     
     //TODO: - 等待用 Algorithms 重写
-    private func findDH(near target: Double) -> DistanceHeight? {
+    public func findDH(near target: Double) -> DistanceHeight? {
         guard !self.isEmpty else { return nil } // Return nil for an empty array
         
         var left = 0
