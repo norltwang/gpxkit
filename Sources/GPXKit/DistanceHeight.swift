@@ -6,8 +6,6 @@ public struct DistanceHeight: Hashable, Sendable, Codable {
     public var distance: Double
     /// Elevation in meters above sea level at that position in the track
     public var elevation: Double
-    /// Coordinate associated with the distance in the track
-    public var coordinate: Coordinate?
 
     /// The Chosen Chart Point`s index in the whole 'heightMap'.
     public var index: Int?

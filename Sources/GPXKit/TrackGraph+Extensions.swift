@@ -166,7 +166,7 @@ extension Array where Element == DistanceHeight {
         return dh.index
     }
     
-    public func findRange(with targetRange: Range<Double>) -> ClosedRange<Int>? {
+    public func findRange(with targetRange: ClosedRange<Double>) -> ClosedRange<Int>? {
         guard let lower = self.findDH(near: targetRange.lowerBound) ,
               let upper = self.findDH(near: targetRange.upperBound) else { return nil }
         guard let lowerIndex = lower.index,let upperIndex = upper.index,lowerIndex < upperIndex else { return nil }
