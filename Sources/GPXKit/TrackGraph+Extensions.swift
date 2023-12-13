@@ -77,6 +77,7 @@ public struct ElevationDataSimplifyManager {
         return [minMax.min,minMax.max]
     }
     
+    @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
     public static func simplifiedData(from origin: HeightMap,with stepper: Double) async -> HeightMap {
         let manager = ElevationDataSimplifyManager(origin: origin, stepper: stepper)
         return manager.simplified
