@@ -21,51 +21,19 @@ extension TrackGraph {
 
 
 //MARK: - ChartData
-
-
-//分析该函数的时间复杂度：o(n) Complexity -> o(n)
-typealias  DHElement = (index: Int, quotient: (Double),remainder: Double)
-func findMultipleElements(near target: Double,in array: [Double]) -> [Double] {
-     
-    guard !array.isEmpty else { return [] }
-    let result = array.enumerated().map { return ($0.offset,$0.element) } //: -> o(n)
-        .map { return ($0.0,($0.1 / target).rounded(.towardZero),$0.1.truncatingRemainder(dividingBy: target)) }//: -> o(n)
-        .chunked(by: { $0.1 == $1.1 })//: -> o(n)
-        .map { Array($0) }
+public typealias HeightMap = [DistanceHeight]
+/// This class works with origin heightMap Data from a GPXTrack,and simplify data with a stepper.
+public struct ElevationDataSimplifyManager {
     
-    var tmps: [(Int,(Double),Double)] = result.compactMap { $0.first } //: -> o(n)
+    public var simplified: HeightMap
+    public init(origin: HeightMap,stepper step: Double) {
+        self.simplified = []
+        self.simplified = (findMultipleDHs(every: step, in: origin) + findMinMax(in: origin)).sorted(by: { $0.distance < $1.distance })
+    }
     
-    let drop = result.dropFirst()
-    let new = zip(result, drop) //: -> o(n)
-    
-//    for item in new.enumerated() {
-//        print(item.offset,item.element)
-//        print("\n")
-//    }
-    
-    new.enumerated().forEach {
-        let index = $0.offset
-        let element = $0.element
-        let q2 = element.1.first.map { $0.1 }!
-        let q1 = element.0.first.map { $0.1 }!
-        if q2 - q1 == 1,
-           let r2 = element.1.first?.2,
-           let r1 = element.0.last?.2,
-           abs(target - r1) < r2,
-           let changed = element.0.last {
-            tmps[index + 1] = changed
-        }
-    } //: -> o(n)
-
-    return tmps.map { array[$0.0] }
-}
-
-public struct ElevationChartData {
-//    private var origin: [DistanceHeight]
-    public var simplified: [DistanceHeight]
-    public var domains: (distance: [Double], elevation: [Double])
-    
-    private func findMultipleDHs(every target: Double,in heightMap: [DistanceHeight]) -> [DistanceHeight] {
+    ///This method search through all datas,and find datas near stepper.
+    ///time complex: o(n)
+    private func findMultipleDHs(every target: Double,in heightMap: HeightMap) -> HeightMap {
         
         guard !heightMap.isEmpty else { return [] }
         
@@ -103,101 +71,18 @@ public struct ElevationChartData {
 
         return tmps.map { heightMap[$0.0] }
     }
-//    private func findMultipleDH(every step: Double,in heightMap: [DistanceHeight]) -> [DistanceHeight] {
-//        var result = [DistanceHeight]()
-//        
-//        // Keep track of the closest element for each multiple of distance
-//        var closestedElements: [Double: DistanceHeight] = [: ]
-//        for (index,dh) in heightMap.enumerated() {
-//           
-//            let closestMultiple = (dh.distance / step).rounded() * step
-//            
-//            // Check if the current value is closer than the previously found closest element
-//            if let currentClosest = closestedElements[closestMultiple] {
-//                if abs(dh.distance - closestMultiple) < abs(currentClosest.distance - closestMultiple) {
-//                    closestedElements[closestMultiple] = dh
-//                    let newDH = DistanceHeight(distance: dh.distance, elevation: dh.elevation, index: index)
-//                    result.append(newDH)
-//                }
-//            } else {
-//                closestedElements[closestMultiple] = dh
-//                let newDH = DistanceHeight(distance: dh.distance, elevation: dh.elevation, index: index)
-//                result.append(newDH)
-//            }
-//        }
-//        return result
-//        
-//    }
-    private func findMinMax(in heightMap: [DistanceHeight]) -> [DistanceHeight] {
+    
+    private func findMinMax(in heightMap: HeightMap) -> HeightMap {
         guard let minMax = heightMap.eleMinMax else { return [ ] }
         return [minMax.min,minMax.max]
     }
-    private func findDH(near target: Double,in heightMap: [DistanceHeight]) -> DistanceHeight? {
-        guard !simplified.isEmpty else { return nil } // Return nil for an empty array
-        
-        var left = 0
-        var right = heightMap.count - 1
-        
-        while left <= right {
-            let mid = left + (right - left) / 2
-            let midValue = heightMap[mid].distance
-
-            if midValue == target {
-                return heightMap[mid]  // Found an exact match
-            } else if midValue < target {
-                left = mid + 1
-            } else {
-                right = mid - 1
-            }
-        }
-        
-        // At this point, left is the index of the smallest element that is greater than the target,
-        // and right is the index of the largest element that is less than the target.
-
-        if left < heightMap.count, right >= 0 {
-            // Check which element is closer to the target
-            let leftDifference = abs(target - heightMap[left].distance)
-            let rightDifference = abs(target - heightMap[right].distance)
-
-            if leftDifference < rightDifference {
-                return heightMap[left]
-            } else {
-                return heightMap[right]
-            }
-        } else if left < heightMap.count {
-            return heightMap[left]
-        } else if right >= 0 {
-            return heightMap[right]
-        } else {
-            return nil  // The array is empty
-        }
-         
-    }
-    public func findDH(near target: Double) -> DistanceHeight? {
-        return findDH(near: target, in: simplified)
-    }
-    public func findIndex(near target: Double) -> Int? {
-        guard let dh = self.findDH(near: target) else { return nil }
-        return dh.index
-    }
     
-    public func findRange(with targetRange: Range<Double>) -> ClosedRange<Int>? {
-        guard let lower = self.findDH(near: targetRange.lowerBound) ,
-              let upper = self.findDH(near: targetRange.upperBound) else { return nil }
-        guard let lowerIndex = lower.index,let upperIndex = upper.index,lowerIndex < upperIndex else { return nil }
-        return (lowerIndex...upperIndex)
+    public static func simplifiedData(from origin: HeightMap,with stepper: Double) async -> HeightMap {
+        let manager = ElevationDataSimplifyManager(origin: origin, stepper: stepper)
+        return manager.simplified
     }
-    
-     
-    public init(origin: [DistanceHeight],step: Double = 50) {
-        self.simplified = []
-        self.domains = origin.domains
-        self.simplified = (self.findMultipleDHs(every: step, in: origin) + findMinMax(in: origin)).sorted(by: { $0.distance < $1.distance })
-    }
-    
     
 }
-
 
 //MARK: - For Elevation Chart
 extension Array where Element == DistanceHeight {
@@ -214,7 +99,7 @@ extension Array where Element == DistanceHeight {
         return minMax
     }
     
-    fileprivate var domains: (distance: [Double], elevation: [Double]) {
+    public var domains: (distance: [Double], elevation: [Double]) {
         return (dis_domain,ele_domain)
     }
     
@@ -230,7 +115,63 @@ extension Array where Element == DistanceHeight {
     }
     
 }
+//MARK: - Find DH with a distance
+extension Array where Element == DistanceHeight {
+    
+    //TODO: - 等待用 Algorithms 重写
+    private func findDH(near target: Double) -> DistanceHeight? {
+        guard !self.isEmpty else { return nil } // Return nil for an empty array
+        
+        var left = 0
+        var right = self.count - 1
+        
+        while left <= right {
+            let mid = left + (right - left) / 2
+            let midValue = self[mid].distance
 
+            if midValue == target {
+                return self[mid]  // Found an exact match
+            } else if midValue < target {
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+        
+        // At this point, left is the index of the smallest element that is greater than the target,
+        // and right is the index of the largest element that is less than the target.
+
+        if left < self.count, right >= 0 {
+            // Check which element is closer to the target
+            let leftDifference = abs(target - self[left].distance)
+            let rightDifference = abs(target - self[right].distance)
+
+            if leftDifference < rightDifference {
+                return self[left]
+            } else {
+                return self[right]
+            }
+        } else if left < self.count {
+            return self[left]
+        } else if right >= 0 {
+            return self[right]
+        } else {
+            return nil  // The array is empty
+        }
+    }
+    
+    public func findIndex(near target: Double) -> Int? {
+        guard let dh = self.findDH(near: target) else { return nil }
+        return dh.index
+    }
+    
+    public func findRange(with targetRange: Range<Double>) -> ClosedRange<Int>? {
+        guard let lower = self.findDH(near: targetRange.lowerBound) ,
+              let upper = self.findDH(near: targetRange.upperBound) else { return nil }
+        guard let lowerIndex = lower.index,let upperIndex = upper.index,lowerIndex < upperIndex else { return nil }
+        return (lowerIndex...upperIndex)
+    }
+}
 
 //MARK: - Find Ascent and Descent
 extension Array where Element == DistanceHeight {
