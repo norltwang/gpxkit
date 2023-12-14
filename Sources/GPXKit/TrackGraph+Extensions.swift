@@ -69,7 +69,7 @@ public struct ElevationDataSimplifyManager {
             }
         } //: -> o(n)
 
-        return tmps.map { heightMap[$0.0] }
+        return tmps.map { heightMap[$0.0].updatedIndex(index: $0.0) }
     }
     
     private func findMinMax(in heightMap: HeightMap) -> HeightMap {
@@ -83,6 +83,18 @@ public struct ElevationDataSimplifyManager {
         return manager.simplified
     }
     
+}
+
+extension DistanceHeight {
+    mutating func updateIndex(index: Int) {
+        self.index = index
+    }
+    
+    func updatedIndex(index: Int) -> DistanceHeight {
+        var value = self
+        value.updateIndex(index: index)
+        return value
+    }
 }
 
 //MARK: - For Elevation Chart
