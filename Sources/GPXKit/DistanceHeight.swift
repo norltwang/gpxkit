@@ -7,6 +7,9 @@ public struct DistanceHeight: Hashable, Sendable, Codable {
     /// Elevation in meters above sea level at that position in the track
     public var elevation: Double
 
+    /// The Chosen Chart Points`s Coordinate Info.
+    public var coordinate: Coordinate?
+    
     /// The Chosen Chart Point`s index in the whole 'heightMap'.
     public var index: Int?
     
@@ -14,9 +17,10 @@ public struct DistanceHeight: Hashable, Sendable, Codable {
     /// - Parameters:
     ///   - distance: Distance from the tracks start location in meters.
     ///   - elevation: Elevation in meters above sea level at that track position.
-    public init(distance: Double, elevation: Double,index: Int? = nil) {
+    public init(distance: Double, elevation: Double,index: Int? = nil,coordinate: Coordinate? = nil) {
         self.distance = distance
         self.elevation = elevation
         self.index = index
+        self.coordinate = coordinate
     }
 }

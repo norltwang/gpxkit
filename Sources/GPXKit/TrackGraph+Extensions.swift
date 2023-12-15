@@ -24,12 +24,24 @@ extension TrackGraph {
 public typealias HeightMap = [DistanceHeight]
 /// This class works with origin heightMap Data from a GPXTrack,and simplify data with a stepper.
 public struct ElevationDataSimplifyManager {
-    
     public var simplified: HeightMap
     public init(origin: HeightMap,stepper step: Double) {
         self.simplified = []
         self.simplified = (findMultipleDHs(every: step, in: origin) + findMinMax(in: origin)).sorted(by: { $0.distance < $1.distance })
     }
+    
+    /*
+    public func newFindDH(near target: Double) -> DistanceHeight? {
+        guard !simplified.isEmpty else { return nil }
+        /* ($0.1.distance / target).rounded(.towardZero),$0.1.distance.truncatingRemainder(dividingBy: target) */
+        let result = simplified.map { dh in
+            return (element: dh, p: (dh.distance / target).rounded(.towardZero),r: dh.distance.truncatingRemainder(dividingBy: target))
+        }
+            .filter({ $0.p == 0 || $0.p == 1 })
+            .chunked(by: { $0.p == $1.p })
+        return nil
+    }
+    */
     
     ///This method search through all datas,and find datas near stepper.
     ///time complex: o(n)
