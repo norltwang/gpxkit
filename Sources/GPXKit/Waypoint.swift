@@ -5,6 +5,7 @@ import Foundation
 public struct Waypoint: Hashable, Sendable, Codable  {
     /// The coordinate (latitude, longitude and elevation in meters)
     public var coordinate: Coordinate
+    public var distance: Double?
     /// Optional date for a given point.
     public var date: Date?
     /// Optional name of the waypoint
@@ -22,9 +23,15 @@ public struct Waypoint: Hashable, Sendable, Codable  {
     ///   - name: Name of the waypoint
     ///   - comment: A short comment
     ///   - waypointDescription: A longer waypointDescription
-    public init(coordinate: Coordinate, date: Date? = nil, name: String? = nil, comment: String? = nil, description: String? = nil) {
+    public init(coordinate: Coordinate,
+                date: Date? = nil,
+                distance: Double? = nil,
+                name: String? = nil,
+                comment: String? = nil,
+                description: String? = nil) {
         self.coordinate = coordinate
         self.date = date
+        self.distance = distance
         self.name = name
         self.comment = comment
         self.waypointDescription = description

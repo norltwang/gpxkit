@@ -15,6 +15,7 @@ public struct TrackPoint: Hashable, Sendable, Codable  {
     /// Optional temperature value for a given point in a gpx file, which got recorded from a bicycle computer through a temperature sensor.
     public var temperature: Measurement<UnitTemperature>?
 
+    public var distance: Double?
     /// Initializer
     /// You don't need to construct this value by yourself, as it is done by GXPKits track parsing logic.
     /// - Parameters:
@@ -24,13 +25,19 @@ public struct TrackPoint: Hashable, Sendable, Codable  {
     ///   - cadence: Optional cadence value for a point. Defaults to nil.
     ///   - heartrate: Optional heartrate value for a point. Defaults to nil.
     ///   - temperature: Optional temperature value for a point. Defaults to nil.
-    public init(coordinate: Coordinate, date: Date? = nil, power: Measurement<UnitPower>? = nil, cadence: UInt? = nil, heartrate: UInt? = nil, temperature: Measurement<UnitTemperature>? = nil) {
+    public init(coordinate: Coordinate, date: Date? = nil, power: Measurement<UnitPower>? = nil, cadence: UInt? = nil, heartrate: UInt? = nil, temperature: Measurement<UnitTemperature>? = nil,distance stamp: Double? = nil) {
         self.coordinate = coordinate
         self.date = date
         self.power = power
         self.cadence = cadence
         self.heartrate = heartrate
         self.temperature = temperature
+        self.distance = stamp
+    }
+    
+    mutating func updateDistancestamp(_ distance: Double)  {
+        self.distance = distance
+        return 
     }
 }
 
